@@ -2,18 +2,17 @@ import { API_BASE_URL } from '$env/static/private';
 
 export const POST = async ({ cookies, request }) => {
 	const body = await request.json();
+	const params = new URLSearchParams();
 
-	console.log('Received request to start game:', body);
+	params.append('player', body.player);
 
 	const response = await fetch(`${API_BASE_URL}/start-game/`, {
 		method: 'POST',
 		headers: {
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/x-www-form-urlencoded'
 		},
-		body: JSON.stringify(body)
+		body: params.toString()
 	});
-
-	console.log(response);
 
 	if (!response.ok) {
 		console.error('Failed to start game:', response);
