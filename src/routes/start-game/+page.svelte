@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+
 	let player = $state('');
 	let postStartGameLoading = $state(false);
 
@@ -24,7 +26,7 @@
 
 		console.log('Start Game Response:', result);
 
-		if (response.ok) window.location.href = '/';
+		if (response.ok) goto('/');
 
 		postStartGameLoading = false;
 	};
