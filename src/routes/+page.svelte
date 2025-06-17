@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { position, updatePosition } from '$lib/stores/position';
-	import { onMount } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 
 	type MapItem = { x: number; y: number; move: string; value: string };
 	type DiscoverMaps = MapItem[];
@@ -10,21 +10,18 @@
 	let moveInProgress = $state(false);
 	let moveHistory = $state<string[]>([]);
 
-	// Add custom CSS for the grid
-	onMount(() => {
-		const style = document.createElement('style');
-		style.textContent = `
-			.grid-cols-17 {
-				grid-template-columns: repeat(17, minmax(0, 1fr));
-			}
-		`;
-		document.head.appendChild(style);
-	});
-
 	const moveUp = async () => await makeMove($position.x, $position.y - 1, 'up');
 	const moveDown = async () => await makeMove($position.x, $position.y + 1, 'down');
 	const moveLeft = async () => await makeMove($position.x - 1, $position.y, 'left');
 	const moveRight = async () => await makeMove($position.x + 1, $position.y, 'right');
+
+	const restartGame = async (message: string) => {
+		alert(message);
+
+		await fetch('/api/restart', { method: 'GET' });
+		updatePosition(0, 0);
+		window.location.reload();
+	};
 
 	const discoverMaps = async () => {
 		mapsLoading = true;
@@ -53,6 +50,18 @@
 		});
 
 		const result = await response.json();
+
+		if (result.dead) {
+			moveInProgress = false;
+			await restartGame('You have fallen into a trap! Game over.');
+			return;
+		}
+
+		if (result.win) {
+			moveInProgress = false;
+			await restartGame('Congratulations! You have reached the goal!');
+			return;
+		}
 
 		updatePosition(result.position_x, result.position_y);
 		moveHistory = [...moveHistory, direction];
@@ -92,8 +101,16 @@
 	let leftStyle = $derived(getMoveStyle('left'));
 	let rightStyle = $derived(getMoveStyle('right'));
 
-	$effect(() => {
+	onMount(() => {
 		discoverMaps();
+
+		const style = document.createElement('style');
+		style.textContent = `
+			.grid-cols-17 {
+				grid-template-columns: repeat(17, minmax(0, 1fr));
+			}
+		`;
+		document.head.appendChild(style);
 	});
 </script>
 

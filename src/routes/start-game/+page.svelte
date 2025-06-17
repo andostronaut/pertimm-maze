@@ -27,7 +27,7 @@
 
 		updatePosition(result.position_x, result.position_y);
 
-		if (response.ok) goto('/');
+		if (response.ok) window.location.reload();
 
 		postStartGameLoading = false;
 	};
