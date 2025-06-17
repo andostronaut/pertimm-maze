@@ -135,13 +135,21 @@
 
 					<div class="flex items-center justify-center gap-8 p-4">
 						<div class="flex items-center justify-center gap-8">
-							<button class={upStyle.className} onclick={moveUp}> ↑ </button>
-							<button class={downStyle.className} onclick={moveDown}> ↓ </button>
+							<button class={upStyle.className} onclick={moveUp} disabled={moveInProgress}>
+								↑
+							</button>
+							<button class={downStyle.className} onclick={moveDown} disabled={moveInProgress}>
+								↓
+							</button>
 						</div>
 
 						<div class="flex items-center justify-center gap-8">
-							<button class={leftStyle.className} onclick={moveLeft}> ← </button>
-							<button class={rightStyle.className} onclick={moveRight}> → </button>
+							<button class={leftStyle.className} onclick={moveLeft} disabled={moveInProgress}>
+								←
+							</button>
+							<button class={rightStyle.className} onclick={moveRight} disabled={moveInProgress}>
+								→
+							</button>
 						</div>
 					</div>
 				</div>
