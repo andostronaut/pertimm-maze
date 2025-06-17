@@ -14,12 +14,12 @@ export const GET = async ({ cookies }) => {
 	});
 
 	if (!response.ok) {
-		console.error('Failed to discover:', response);
 		return new Response(JSON.stringify({ error: { message: 'Failed to discover' } }), {
 			status: 400
 		});
 	}
 
 	const data = await response.json();
+
 	return new Response(JSON.stringify(data), { status: 200 });
 };

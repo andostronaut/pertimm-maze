@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { updatePosition } from '$lib/stores/position';
 
 	let player = $state('');
 	let postStartGameLoading = $state(false);
@@ -24,7 +25,7 @@
 
 		const result = await response.json();
 
-		console.log('Start Game Response:', result);
+		updatePosition(result.position_x, result.position_y);
 
 		if (response.ok) goto('/');
 

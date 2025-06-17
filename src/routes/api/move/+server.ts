@@ -17,7 +17,6 @@ export const POST = async ({ cookies, request }) => {
 	});
 
 	if (!response.ok) {
-		console.error('Failed to make move:', response);
 		return new Response(JSON.stringify({ error: { message: 'Failed to make move' } }), {
 			status: 400
 		});
