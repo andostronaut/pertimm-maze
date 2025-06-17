@@ -2,13 +2,11 @@
 	import { onMount } from 'svelte';
 
 	import Legend from '../components/legend.svelte';
-	import Surroundings from '../components/surroundings.svelte';
 
 	import { getCellColor } from '$lib';
 	import { position, updatePosition } from '$lib/stores/position';
 
-	type MapItem = { x: number; y: number; move: string; value: string };
-	type DiscoverMaps = MapItem[];
+	import type { DiscoverMaps } from '$lib/types';
 
 	let mapsLoading = $state(false);
 	let maps = $state<DiscoverMaps>([]);
@@ -112,10 +110,7 @@
 		<div class="mb-8 border-8 border-black bg-white p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
 			<h1 class="mb-8 text-center text-6xl font-black tracking-tight">PERTIMM - MAZE</h1>
 
-			<div class="mb-6 flex items-center justify-between">
-				<div class="border-4 border-black bg-yellow-100 p-4">
-					<span class="text-lg font-bold">POSITION: ({$position.x}, {$position.y})</span>
-				</div>
+			<div class="mb-6 flex items-center justify-center">
 				<div class="border-4 border-black bg-yellow-100 p-4">
 					<span class="text-lg font-bold">MOVES: {moveHistory.length}</span>
 				</div>
@@ -182,9 +177,6 @@
 					</div>
 				</div>
 			</div>
-
-			<Surroundings {mapsLoading} {maps} />
-
 			<Legend />
 		</div>
 	</div>
