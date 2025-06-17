@@ -1,6 +1,11 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+
+	import Legend from '../components/legend.svelte';
+	import Surroundings from '../components/surroundings.svelte';
+
+	import { getCellColor } from '$lib';
 	import { position, updatePosition } from '$lib/stores/position';
-	import { onMount, setContext } from 'svelte';
 
 	type MapItem = { x: number; y: number; move: string; value: string };
 	type DiscoverMaps = MapItem[];
@@ -71,14 +76,6 @@
 		moveInProgress = false;
 	};
 
-	const getCellColor = (value: string) => {
-		if (value.includes('wall')) return 'bg-gray-500';
-		if (value.includes('trap')) return 'bg-red-500';
-		if (value.includes('home')) return 'bg-blue-500';
-		if (value.includes('stop')) return 'bg-green-500';
-		return 'bg-white';
-	};
-
 	const getMoveStyle = (direction: string) => {
 		const availableMove = maps.find(
 			(m) =>
@@ -103,14 +100,6 @@
 
 	onMount(() => {
 		discoverMaps();
-
-		const style = document.createElement('style');
-		style.textContent = `
-			.grid-cols-17 {
-				grid-template-columns: repeat(17, minmax(0, 1fr));
-			}
-		`;
-		document.head.appendChild(style);
 	});
 </script>
 
@@ -142,27 +131,23 @@
 						</div>
 					{:else}
 						<div class="overflow-auto border-2 border-black p-2">
-							<div class="mx-auto grid w-fit grid-cols-17 gap-0">
-								{#each Array(17) as _, rowIndex}
-									{#each Array(17) as _, colIndex}
-										{@const x = $position.x - 8 + colIndex}
-										{@const y = $position.y - 8 + rowIndex}
+							<div class="mx-auto grid w-fit grid-cols-3 gap-0">
+								{#each Array(3) as _, rowIndex}
+									{#each Array(3) as _, colIndex}
+										{@const x = $position.x - 1 + colIndex}
+										{@const y = $position.y - 1 + rowIndex}
 										{@const mapCell = maps.find((m) => m.x === x && m.y === y)}
 										{@const isCurrentPosition = x === $position.x && y === $position.y}
+
 										<div
-											class={`
-												h-[20px] w-[20px] 
-												border border-black 
-												${mapCell ? getCellColor(mapCell.value) : 'bg-white'}
-												${isCurrentPosition ? 'relative' : ''}
-											`}
+											class={`h-[50px] w-[50px] border border-black ${mapCell ? getCellColor(mapCell.value) : $position.x === 0 && $position.y === 0 ? 'bg-white' : 'bg-gray-500'} ${isCurrentPosition ? 'relative' : ''}`}
 											title={mapCell
 												? `${mapCell.value} at (${x}, ${y})`
 												: `Unknown at (${x}, ${y})`}
 										>
 											{#if isCurrentPosition}
-												<div class="absolute inset-0 flex items-center justify-center">
-													<div class="h-3 w-3 rounded-full bg-black"></div>
+												<div class="absolute inset-0 flex items-center justify-center bg-white">
+													<div class="h-6 w-6 rounded-full bg-black"></div>
 												</div>
 											{/if}
 										</div>
@@ -198,56 +183,9 @@
 				</div>
 			</div>
 
-			<div class="border-4 border-black bg-gray-100 p-4">
-				<h2 class="mb-4 text-2xl font-black">SURROUNDINGS</h2>
+			<Surroundings {mapsLoading} {maps} />
 
-				{#if mapsLoading}
-					<p class="text-lg font-bold">Exploring the area...</p>
-				{:else}
-					<div class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-						{#each maps.filter((m) => m.x === $position.x && m.y === $position.y) as current}
-							<div class="border-2 border-black bg-blue-200 p-3">
-								<span class="block font-bold">CURRENT LOCATION:</span>
-								<span>{current.value}</span>
-							</div>
-						{/each}
-
-						{#each maps.filter((m) => (m.x !== $position.x || m.y !== $position.y) && Math.abs(m.x - $position.x) <= 1 && Math.abs(m.y - $position.y) <= 1) as nearby}
-							<div class="border-2 border-black bg-yellow-100 p-3">
-								<span class="block font-bold">({nearby.x}, {nearby.y}):</span>
-								<span>{nearby.value}</span>
-							</div>
-						{/each}
-					</div>
-				{/if}
-			</div>
-
-			<div class="mt-6 border-4 border-black bg-gray-100 p-4">
-				<h2 class="mb-4 text-2xl font-black">LEGEND</h2>
-
-				<div class="grid grid-cols-2 gap-2 text-sm md:grid-cols-5">
-					<div class="flex items-center gap-2">
-						<div class="h-6 w-6 border-2 border-black bg-gray-500"></div>
-						<span class="font-black">WALL</span>
-					</div>
-					<div class="flex items-center gap-2">
-						<div class="h-6 w-6 border-2 border-black bg-white"></div>
-						<span class="font-black">PATH</span>
-					</div>
-					<div class="flex items-center gap-2">
-						<div class="h-6 w-6 border-2 border-black bg-red-500"></div>
-						<span class="font-black">TRAP</span>
-					</div>
-					<div class="flex items-center gap-2">
-						<div class="h-6 w-6 border-2 border-black bg-green-500"></div>
-						<span class="font-black">GOAL</span>
-					</div>
-					<div class="flex items-center gap-2">
-						<div class="h-6 w-6 border-2 border-black bg-blue-500"></div>
-						<span class="font-black">HOME</span>
-					</div>
-				</div>
-			</div>
+			<Legend />
 		</div>
 	</div>
 </div>
