@@ -136,7 +136,7 @@
 											class={`
 												h-[20px] w-[20px] 
 												border border-black 
-												${mapCell ? getCellColor(mapCell.value) : 'bg-gray-300'}
+												${mapCell ? getCellColor(mapCell.value) : 'bg-white'}
 												${isCurrentPosition ? 'relative' : ''}
 											`}
 											title={mapCell
