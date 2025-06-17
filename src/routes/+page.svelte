@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { position, updatePosition } from '$lib/stores/position';
+	import { onMount } from 'svelte';
 
 	type MapItem = { x: number; y: number; move: string; value: string };
 	type DiscoverMaps = MapItem[];
@@ -8,6 +9,17 @@
 	let maps = $state<DiscoverMaps>([]);
 	let moveInProgress = $state(false);
 	let moveHistory = $state<string[]>([]);
+
+	// Add custom CSS for the grid
+	onMount(() => {
+		const style = document.createElement('style');
+		style.textContent = `
+			.grid-cols-17 {
+				grid-template-columns: repeat(17, minmax(0, 1fr));
+			}
+		`;
+		document.head.appendChild(style);
+	});
 
 	const moveUp = async () => await makeMove($position.x, $position.y - 1, 'up');
 	const moveDown = async () => await makeMove($position.x, $position.y + 1, 'down');
@@ -108,24 +120,38 @@
 					<h2 class="mb-4 text-2xl font-black">MAP</h2>
 
 					{#if mapsLoading}
-						<div class="flex h-64 items-center justify-center">
+						<div class="flex h-[340px] items-center justify-center">
 							<span class="text-xl font-bold">Loading map...</span>
 						</div>
 					{:else}
-						<div class="relative h-64 w-full border-2 border-black">
-							{#each maps as map}
-								<div
-									class={`absolute border border-black ${getCellColor(map.value)}`}
-									style="width: 20px; height: 20px; left: {(map.x - $position.x + 8) *
-										20}px; top: {(map.y - $position.y + 8) * 20}px;"
-									title="{map.value} at ({map.x}, {map.y})"
-								></div>
-							{/each}
-
-							<div
-								class="absolute border-2 border-black bg-red-500"
-								style="width: 20px; height: 20px; left: 160px; top: 160px;"
-							></div>
+						<div class="overflow-auto border-2 border-black p-2">
+							<div class="mx-auto grid w-fit grid-cols-17 gap-0">
+								{#each Array(17) as _, rowIndex}
+									{#each Array(17) as _, colIndex}
+										{@const x = $position.x - 8 + colIndex}
+										{@const y = $position.y - 8 + rowIndex}
+										{@const mapCell = maps.find((m) => m.x === x && m.y === y)}
+										{@const isCurrentPosition = x === $position.x && y === $position.y}
+										<div
+											class={`
+												h-[20px] w-[20px] 
+												border border-black 
+												${mapCell ? getCellColor(mapCell.value) : 'bg-gray-300'}
+												${isCurrentPosition ? 'relative' : ''}
+											`}
+											title={mapCell
+												? `${mapCell.value} at (${x}, ${y})`
+												: `Unknown at (${x}, ${y})`}
+										>
+											{#if isCurrentPosition}
+												<div class="absolute inset-0 flex items-center justify-center">
+													<div class="h-3 w-3 rounded-full bg-black"></div>
+												</div>
+											{/if}
+										</div>
+									{/each}
+								{/each}
+							</div>
 						</div>
 					{/if}
 				</div>
