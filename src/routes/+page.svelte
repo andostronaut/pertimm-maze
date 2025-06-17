@@ -9,22 +9,10 @@
 	let moveInProgress = $state(false);
 	let moveHistory = $state<string[]>([]);
 
-	const moveUp = async () => {
-		console.log('Moving up');
-		await makeMove($position.x, $position.y - 1, 'up');
-	};
-	const moveDown = async () => {
-		console.log('Moving down');
-		await makeMove($position.x, $position.y + 1, 'down');
-	};
-	const moveLeft = async () => {
-		console.log('Moving left');
-		await makeMove($position.x - 1, $position.y, 'left');
-	};
-	const moveRight = async () => {
-		console.log('Moving right');
-		await makeMove($position.x + 1, $position.y, 'right');
-	};
+	const moveUp = async () => await makeMove($position.x, $position.y - 1, 'up');
+	const moveDown = async () => await makeMove($position.x, $position.y + 1, 'down');
+	const moveLeft = async () => await makeMove($position.x - 1, $position.y, 'left');
+	const moveRight = async () => await makeMove($position.x + 1, $position.y, 'right');
 
 	const discoverMaps = async () => {
 		mapsLoading = true;
@@ -40,7 +28,6 @@
 		if (moveInProgress) return;
 
 		moveInProgress = true;
-		console.log(`Making move to (${x}, ${y}) in direction ${direction}`);
 
 		const response = await fetch('/api/move', {
 			method: 'POST',
@@ -83,7 +70,6 @@
 		const isWall = availableMove?.value?.includes('wall');
 
 		return {
-			disabled: moveInProgress || !availableMove || isWall,
 			className: `p-4 text-2xl font-black border-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] 
 				${isWall ? 'bg-red-200 text-gray-500 cursor-not-allowed' : 'bg-yellow-400 hover:bg-yellow-300 hover:translate-y-1 hover:shadow-[4px_3px_0px_0px_rgba(0,0,0,1)] transition-all'}`
 		};
@@ -149,27 +135,13 @@
 
 					<div class="flex items-center justify-center gap-8 p-4">
 						<div class="flex items-center justify-center gap-8">
-							<button class={upStyle.className} onclick={moveUp} disabled={upStyle.disabled}>
-								↑
-							</button>
-
-							<button class={downStyle.className} onclick={moveDown} disabled={downStyle.disabled}>
-								↓
-							</button>
+							<button class={upStyle.className} onclick={moveUp}> ↑ </button>
+							<button class={downStyle.className} onclick={moveDown}> ↓ </button>
 						</div>
 
 						<div class="flex items-center justify-center gap-8">
-							<button class={leftStyle.className} onclick={moveLeft} disabled={leftStyle.disabled}>
-								←
-							</button>
-
-							<button
-								class={rightStyle.className}
-								onclick={moveRight}
-								disabled={rightStyle.disabled}
-							>
-								→
-							</button>
+							<button class={leftStyle.className} onclick={moveLeft}> ← </button>
+							<button class={rightStyle.className} onclick={moveRight}> → </button>
 						</div>
 					</div>
 				</div>
